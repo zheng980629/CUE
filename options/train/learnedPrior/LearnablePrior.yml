@@ -1,0 +1,159 @@
+name: LearnablePrior_enhancement
+use_tb_logger: true
+model_type: LearnablePirorModel
+scale: 1
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 10
+#### datasets
+
+datasets:
+  train:
+    name: LOL
+    type: PairedImageDataset
+    dataroot_gt: 
+    dataroot_lq: 
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+      # (for lmdb)
+      # type: lmdb
+
+    gt_size: 224
+    use_flip: true
+    use_rot: true
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 6
+    batch_size_per_gpu: 4
+    dataset_enlarge_ratio: 10
+    prefetch_mode: ~
+
+  val:
+    name: LOL
+    type: PairedImageDataset
+    dataroot_gt: 
+    dataroot_lq: 
+    io_backend:
+      type: disk
+
+
+#### network structures
+network_g:
+  type: LearnablePriorEnhanceNet
+  stage: 3
+  illu_channel: 1
+  refl_channel: 3
+  noise_channel: 3
+  num_feat: 32
+  ratio: 5
+  alpha: 0.001
+  beta: 0.001
+  mu: 10.0
+
+network_noisePrior:
+  type: MaskedAutoencoderViTHOG
+  img_size: 224
+  patch_size: 16
+  in_chans: 3
+  out_chans: 1
+  embed_dim: 256
+  depth: 4
+  num_heads: 4
+  decoder_embed_dim: 256
+  decoder_depth: 4
+  decoder_num_heads: 2
+  mlp_ratio: 2.
+
+
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+  pretrain_network_noisePrior: noisePrior.pth
+  strict_load_noisePrior: true
+  resume_state: ~
+
+
+train:
+  ema_decay: 0.999
+  mask_ratio: 0.5
+  optim_g:
+    type: Adam
+    lr: !!float 1e-4
+    weight_decay: 0
+    betas: [0.9, 0.999]
+
+  scheduler:
+    type: MultiStepLR
+    milestones: [50000, 100000, 150000, 200000, 250000]
+    gamma: 0.5
+
+  total_iter: 300000
+  warmup_iter: -1  # no warm up
+  dual: False
+
+  # losses
+  gtRecon_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+  lowRecon_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+  refl_opt:
+    type: L1Loss
+    loss_weight: 0.009
+    reduction: mean
+  illuMutualInput_opt:
+    type: illuMutualInputLoss
+    loss_weight: 0.001
+    reduction: mean
+  illuMutual_opt:
+    type: illuMutualLoss
+    loss_weight: 0.2
+    reduction: mean
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+  enhancedIllu_opt:
+    type: MSELoss
+    loss_weight: 1.0
+    reduction: mean
+  enhancedIlluTV_opt:
+    type: IlluTVLoss
+    loss_weight: 5.0
+    reduction: mean
+  reflRestore_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+  noisePrior_opt:
+    type: L1Loss
+    loss_weight: 0.001
+    reduction: mean
+
+val:
+  val_freq: !!float 2000
+  save_img: true
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    ssim: # metric name, can be arbitrary
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false
+
+#### logger
+
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 2000
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~

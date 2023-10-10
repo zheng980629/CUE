@@ -1,0 +1,113 @@
+name: MAE_refl_hog
+use_tb_logger: true
+model_type: MAEReflHOGModel
+scale: 1
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 10
+#### datasets
+
+mask_ratio: 0.5
+datasets:
+  train:
+    name: LOL
+    type: PairedImageMAEDHOGataset
+    dataroot_gt: 
+    dataroot_lq: 
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+      # (for lmdb)
+      # type: lmdb
+
+    gt_size: 224
+    use_flip: true
+    use_rot: true
+    win_size: 16
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 0
+    batch_size_per_gpu: 8
+    dataset_enlarge_ratio: 10
+    prefetch_mode: ~
+
+  val:
+    name: LOL
+    type: PairedImageMAEDHOGataset
+    dataroot_gt: 
+    dataroot_lq: 
+    io_backend:
+      type: disk
+    gt_size: 224
+
+
+#### network structures
+network_g:
+  type: MaskedAutoencoderViTHOG
+  img_size: 224
+  patch_size: 16
+  in_chans: 3
+  out_chans: 1
+  embed_dim: 256
+  depth: 4
+  num_heads: 4
+  decoder_embed_dim: 256
+  decoder_depth: 4
+  decoder_num_heads: 2
+  mlp_ratio: 2.
+
+
+#### path
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+  resume_state: ~
+
+#### training settings: learning rate scheme, loss
+
+train:
+  ema_decay: 0.999
+  mask_ratio: 0.5
+  optim_g:
+    type: Adam
+    lr: !!float 5e-4
+    weight_decay: 0
+    betas: [0.9, 0.999]
+
+  scheduler:
+    type: MultiStepLR
+    milestones: [50000, 100000, 150000, 250000]
+    gamma: 0.5
+
+  total_iter: 300000
+  warmup_iter: -1  # no warm up
+  dual: False
+
+  # losses
+  forward:
+    type: MAEHOGLoss
+    loss_weight: !!float 1
+    img_size: 224
+    patch_size: 16
+    in_chans: 1
+    embed_dim: 256
+
+val:
+  val_freq: !!float 2000
+  save_img: true
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+
+#### logger
+
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 2000
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~

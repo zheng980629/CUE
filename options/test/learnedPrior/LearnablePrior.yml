@@ -1,0 +1,60 @@
+name: LearnablePrior_LOL
+model_type: LearnablePirorModel
+scale: 1
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 10
+#### datasets
+
+datasets:
+  test_1:  # the 1st test dataset
+    name: LOL
+    type: PairedImageDataset
+    dataroot_gt: /LOL/test/normal
+    dataroot_lq: /LOL/test/low
+    io_backend:
+      type: disk
+
+network_g:
+  type: LearnablePriorEnhanceNet
+  stage: 3
+  illu_channel: 1
+  refl_channel: 3
+  noise_channel: 3
+  num_feat: 32
+  ratio: 5
+  alpha: 0.001
+  beta: 0.001
+  mu: 10.0
+
+network_noisePrior:
+  type: MaskedAutoencoderViTHOG
+  img_size: 224
+  patch_size: 16
+  in_chans: 3
+  out_chans: 1
+  embed_dim: 256
+  depth: 4
+  num_heads: 4
+  decoder_embed_dim: 256
+  decoder_depth: 4
+  decoder_num_heads: 2
+  mlp_ratio: 2.
+
+#### path
+path:
+  pretrain_network_g: enhanceNet.pth
+  param_key_g: params_ema
+
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+    SSIM: # metric name, can be arbitrary
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: false
