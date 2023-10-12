@@ -17,7 +17,7 @@ Updating the paths in configure files of /CUE/options/test/learnedPrior/Learnabl
 
 2. Run the testing commands.
  ```
-python test -opt /CUE/options/test/learnedPrior/LearnablePrior.yml
+python test.py -opt /CUE/options/test/learnedPrior/LearnablePrior.yml
 ```
 
 ## How to train CUE
