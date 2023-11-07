@@ -248,20 +248,8 @@ class LearnablePirorModel(BaseModel):
 
             visuals = self.get_current_visuals()
             # [0-255]
-            low_img = tensor2img([visuals['lq']])
-            reconLow_img = tensor2img([visuals['reconLow']])
-            illu_img = tensor2img([visuals['illu']])
-            refl_img = tensor2img([visuals['refl']])
-            noise_mg = tensor2img([visuals['noise']])
-            L_prior_cond_img = tensor2img([visuals['L_prior_cond']])
-            enhanced_L_img = tensor2img([visuals['enhanced_L']])
-            restored_R_img = tensor2img([visuals['restored_R']])
+
             enhanced_img = tensor2img([visuals['enhanced']])
-            enhanedFake_img = tensor2img(visuals['enhancedFake'])
-            reconGT_img = tensor2img([visuals['reconGT']])
-            gt_R_img = tensor2img([visuals['gt_R']])
-            gt_L_img = tensor2img([visuals['gt_L']])
-            gt_noise_img = tensor2img([visuals['gt_noise']])
             metric_data['img'] = enhanced_img
             if 'gt' in visuals:
                 # gt_img = tensor2img([visuals['gt']])
@@ -275,114 +263,16 @@ class LearnablePirorModel(BaseModel):
 
             if save_img:
                 if self.opt['is_train']:
-                    save_img_path_low = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_low.png')
-                    save_img_path_reconLow = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_reconLow.png')
-                    save_img_path_gt = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_gt.png')
-                    save_img_path_illu = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_lowIllu.png')
-                    save_img_path_refl = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_lowRefl.png')
-                    save_img_path_noise = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_lowNoise.png')
-                    save_img_path_LpriorCond = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_lowLphat.png')
-                    save_img_path_enhancedL = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_enhancedL.png')
-                    save_img_path_restoredR = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_restoredR.png')
                     save_img_path_enhanced = osp.join(self.opt['path']['visualization'], img_name,
                                              f'{img_name}_{current_iter}_enhanced.png')
-                    save_img_path_enhancedFake = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_enhancedFake.png')
-                    save_img_path_reconGT = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_reconGT.png')
-                    save_img_path_gtR = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_gtR.png')
-                    save_img_path_gtL = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_gtL.png')
-                    save_img_path_gtNoise = osp.join(self.opt['path']['visualization'], img_name,
-                                             f'{img_name}_{current_iter}_gtNoise.png')
                 else:
                     if self.opt['val']['suffix']:
-                        save_img_path_low = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_low.png')
-                        save_img_path_reconLow = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_reconLow.png')
-                        save_img_path_gt = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_gt.png')
-                        save_img_path_illu = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_lowIllu.png')
-                        save_img_path_refl = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_lowRefl.png')
-                        save_img_path_noise = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_lowNoise.png')
-                        save_img_path_LpriorCond = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_lowLphat.png')
-                        save_img_path_enhancedL = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_enhancedL.png')
-                        save_img_path_restoredR = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_restoredR.png')
                         save_img_path_enhanced = osp.join(self.opt['path']['visualization'], img_name,
                                                 f'{img_name}_{current_iter}_enhanced.png')
-                        save_img_path_enhancedFake = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_enhancedFake.png')
-                        save_img_path_reconGT = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_reconGT.png')
-                        save_img_path_gtR = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_gtR.png')
-                        save_img_path_gtL = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_gtL.png')
-                        save_img_path_gtNoise = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_gtNoise.png')
                     else:
-                        save_img_path_low = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_low.png')
-                        save_img_path_reconLow = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_reconLow.png')
-                        save_img_path_gt = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_gt.png')
-                        save_img_path_illu = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_lowIllu.png')
-                        save_img_path_refl = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_lowRefl.png')
-                        save_img_path_noise = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_lowNoise.png')
-                        save_img_path_LpriorCond = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_lowLphat.png')
-                        save_img_path_enhancedL = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_enhancedL.png')
-                        save_img_path_restoredR = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_restoredR.png')
                         save_img_path_enhanced = osp.join(self.opt['path']['visualization'], img_name,
                                                 f'{img_name}_{current_iter}_enhanced.png')
-                        save_img_path_enhancedFake = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_enhancedFake.png')
-                        save_img_path_reconGT = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_reconGT.png')
-                        save_img_path_gtR = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_gtR.png')
-                        save_img_path_gtL = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_gtL.png')
-                        save_img_path_gtNoise = osp.join(self.opt['path']['visualization'], img_name,
-                                                f'{img_name}_{current_iter}_gtNoise.png')
-                imwrite(low_img, save_img_path_low)
-                imwrite(reconLow_img, save_img_path_reconLow)
-                imwrite(gt_img, save_img_path_gt)
-                imwrite(illu_img, save_img_path_illu)
-                imwrite(refl_img, save_img_path_refl)
-                imwrite(noise_mg, save_img_path_noise)
-                imwrite(L_prior_cond_img, save_img_path_LpriorCond)
-                imwrite(enhanced_L_img, save_img_path_enhancedL)
-                imwrite(restored_R_img, save_img_path_restoredR)
                 imwrite(enhanced_img, save_img_path_enhanced)
-                imwrite(enhanedFake_img, save_img_path_enhancedFake)
-                imwrite(reconGT_img, save_img_path_reconGT)
-                imwrite(gt_R_img, save_img_path_gtR)
-                imwrite(gt_L_img, save_img_path_gtL)
-                imwrite(gt_noise_img, save_img_path_gtNoise)
 
             if with_metrics:
                 # calculate metrics
@@ -410,20 +300,7 @@ class LearnablePirorModel(BaseModel):
 
     def get_current_visuals(self):
         out_dict = OrderedDict()
-        out_dict['lq'] = self.lq.detach().cpu()
-        out_dict['reconLow'] = self.R_test.detach().cpu() * self.L_test.detach().cpu()
-        out_dict['illu'] = self.L_test.detach().cpu()
-        out_dict['enhanced_L'] = self.enhanced_L_test.detach().cpu()
         out_dict['enhanced'] = self.output_test.detach().cpu()
-        out_dict['enhancedFake'] = self.gt_L_test.detach().cpu() * self.R_test.detach().cpu()
-        out_dict['refl'] = self.R_test.detach().cpu()
-        out_dict['restored_R'] = self.restored_R_test.detach().cpu()
-        out_dict['noise'] = self.noise_test.detach().cpu() * 1000
-        out_dict['L_prior_cond'] = self.L_prior_cond_test.detach().cpu()
-        out_dict['reconGT'] = self.gt_R_test.detach().cpu() * self.gt_L_test.detach().cpu()
-        out_dict['gt_R'] = self.gt_R_test.detach().cpu()
-        out_dict['gt_L'] = self.gt_L_test.detach().cpu()
-        out_dict['gt_noise'] = self.gt_noise_test.detach().cpu() * 1000
         if hasattr(self, 'gt'):
             out_dict['gt'] = self.gt.detach().cpu()
         return out_dict
