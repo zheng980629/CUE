@@ -218,13 +218,13 @@ class LearnablePirorModel(BaseModel):
         if hasattr(self, 'net_g_ema'):
             self.net_g_ema.eval()
             with torch.no_grad():
-                self.output_test, self.enhanced_L_test, self.L_test, self.restored_R_test, self.R_test, self.noise_test, self.L_prior_cond_test = self.net_g_ema(self.lq)
+                self.output_test, _, _, _, _, _, _ = self.net_g_ema(self.lq)
                 _, _, self.gt_L_test, _, self.gt_R_test, self.gt_noise_test, _ = self.net_g_ema(self.gt)
                 # self.gt_R_test = self.gt / (torch.max(self.gt, 1)[0].unsqueeze(1) + 1e-8)
         else:
             self.net_g.eval()
             with torch.no_grad():
-                self.output_test, self.enhanced_L_test, self.L_test, self.restored_R_test, self.R_test, self.noise_test, self.L_prior_cond_test = self.net_g(self.lq)
+                self.output_test, _, _, _, _, _, _ = self.net_g(self.lq)
                 _, _, self.gt_L_test, _, self.gt_R_test, self.gt_noise_test, _ = self.net_g(self.gt)
                 # self.gt_R_test = self.gt / (torch.max(self.gt, 1)[0].unsqueeze(1) + 1e-8)
             self.net_g.train()
